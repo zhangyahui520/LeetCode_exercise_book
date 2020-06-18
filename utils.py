@@ -10,6 +10,10 @@
     Description :
        做题中常用的一些函数
 """
+import functools
+import time
+
+
 class ListNode:
     def __init__(self, x):
         self.val = x
@@ -35,3 +39,24 @@ def number_to_linked_list(self, res):
         pre = pre.next
         res = res // 10
     return dummy.next
+
+
+
+def print_execute_time(func):
+    '''定义一个计算执行时间的函数作装饰器，传入参数为装饰的函数或方法'''
+
+    # 定义嵌套函数，用来打印出装饰的函数的执行时间
+    @functools.wraps(func)
+    def call_func(*args, **kwargs):
+        # 定义开始时间和结束时间，将func夹在中间执行，取得其返回值
+        start = time.time()
+        func_return = func(*args, **kwargs)
+        cost = time.time() - start
+        cost = round(cost, 3)
+        # 打印方法名称和其执行时间
+        print('方法{}的运行时间是：{}s'.format(func.__name__, cost))
+        # 返回func的返回值
+        return func_return
+
+    # 返回嵌套的函数
+    return call_func
