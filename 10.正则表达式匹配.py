@@ -17,54 +17,55 @@
  
  2/注意，必须完全匹配， p不能多余。。。
  3/只是通过坐标，无法判断长度是否相等，所以定义一个变量，存储匹配结果
+ 
+ 
+ 以上全错， 本题考查动态规划的问题，哈哈哈！
 '''
+
+import re
 
 
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
-        # i, j 分别是s, p的索引
-        i, j = 0, 0
-        res = ''
-        while i < len(s) and j < len(p):
-            if p[j:j + 2] == '.*':  # 如果出现.*，需要判断p后面是否还有字符
-                if j + 2 != len(p):  # 后面还有数，向下遍历，找到s[i] ==p[j]的地方
-                    while i < len(s):
-                        if s[i] == s[j]:
-                            break
-                        else:
-                            res += s[i]
-                            i += 1
-                else:
-                    return True
 
-            # 先判断 p的下一位是 * , 如果两个字符相等，则匹配S的下一个字符
-            # 否则就跳过p的两位
-            if j + 1 < len(p) and p[j + 1] == '*':
-                if s[i] == p[j]:
-                    res += s[i]
-                    i += 1
+        if not p: return not s
+        if not s and len(p) == 1: return False
+
+        m = len(s) + 1
+        n = len(p) + 1
+
+        dp = [[False for c in range(n)] for _ in range(m)]
+
+        dp[0][0] = True
+        dp[0][1] = False
+
+        for c in range(2, n):
+            j = c - 1
+            if p[j] == '*':
+                dp[0][c] = dp[0][c - 2]
+
+        for r in range(1, m):
+            i = r - 1
+            for c in range(1, n):
+                j = c - 1
+                if s[i] == p[j] or p[j] == '.':
+                    dp[r][c] = dp[r - 1][c - 1]
+                elif p[j] == '*':
+                    if p[j - 1] == s[i] or p[j - 1] == '.':
+                        dp[r][c] = dp[r - 1][c] or dp[r][c - 2]
+                    else:
+                        dp[r][c] = dp[r][c - 2]
                 else:
-                    j += 2
-            else:
-                # 进行字符匹配
-                if s[i] == p[j]:
-                    res +=s[i]
-                    i += 1
-                    j += 1
-                elif p[j] == '.':
-                    res += s[i]
-                    i += 1
-                    j += 1
-                else:
-                    return False
-            print(i, j)
-        print(res)
-        return i == len(s)
+                    dp[r][c] = False
+
+        return dp[m - 1][n - 1]
+
 
 
 if __name__ == '__main__':
-    s = 'aaaa'
-    p = 'aaaaa'
+    s = 'aaa'
+    p = 'ab*a*c*a'
+    print(re.compile(p).findall(s))
     solution = Solution()
     res = solution.isMatch(s, p)
     print(res)
