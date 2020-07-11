@@ -103,6 +103,7 @@ class Solution:
             color, node = stack.pop()
             if node is None: continue
             if color == WHITE:
+                # 先放右结点，再放根结点，再放左节点，这样栈弹出的次序才会是左-根-右
                 stack.append((WHITE, node.right))
                 stack.append((GRAY, node))
                 stack.append((WHITE, node.left))
